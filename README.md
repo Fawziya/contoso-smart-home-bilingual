@@ -16,6 +16,6 @@ bun dev
 
 If you open [http://localhost:3000](http://localhost:3000) with your browser you should get the following result:
 
-![Contoso Outdoors Home Page](images/contosoweb.png "Contoso Outdoors Home Page")
+![Contoso Smart Home's Home Page](contosoweb.png "Contoso Smart Home's Home Page")
 
 Demo originally created by [Seth Juarez](https://github.com/sethjuarez)
