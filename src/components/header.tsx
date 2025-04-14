@@ -26,7 +26,7 @@ export const Header = ({
   
   const user = {
     name: "Jen Yu",
-    email: "smart.home@meowtica.com",
+    email: "smart.home@contoso.com",
     image: "/people/jenyu.jpg",
   };
 
