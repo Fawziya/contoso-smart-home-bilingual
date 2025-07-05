@@ -8,6 +8,7 @@ import Image from "next/image";
 import { Product } from "@/lib/types";
 import { marked } from "marked";
 import Header from "@/components/header";
+import CountdownBanner from "@/components/countdown-banner";
 import { getImageWithTimestamp } from "@/lib/imageUtils";
 
 // 支持的语言列表
@@ -273,8 +274,11 @@ export default function ProductPage({
   // 渲染产品页面
   return (
     <>
-      <Header params={{slug: resolvedParams.slug}} searchParams={resolvedSearchParams || {}} />
-      <Block innerClassName="pt-6 pb-6">
+      {/* Countdown Banner */}
+      <CountdownBanner productSlug={resolvedParams?.slug || ''} />
+      
+      <Header params={{slug: resolvedParams?.slug || ''}} searchParams={resolvedSearchParams || {}} />
+      <Block innerClassName="pt-20 pb-6">
         <div className="text-6xl pb-5 pt-8 subpixel-antialiased font-serif ">
           {product.nameZh && locale === 'zh' ? product.nameZh : product.name}
         </div>

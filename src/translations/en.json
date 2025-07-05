@@ -17,5 +17,10 @@
     "outOfStock": "Out of stock",
     "discount": "11% off",
     "loading": "Loading..."
+  },
+  "countdown": {
+    "flashSale": "FLASH SALE",
+    "promotion": "50% OFF Sale starts in:",
+    "timeLeft": "Time Left"
   }
 }
