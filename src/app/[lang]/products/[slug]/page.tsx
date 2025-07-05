@@ -278,7 +278,7 @@ export default function ProductPage({
       <CountdownBanner productSlug={resolvedParams?.slug || ''} />
       
       <Header params={{slug: resolvedParams?.slug || ''}} searchParams={resolvedSearchParams || {}} />
-      <Block innerClassName="pt-20 pb-6">
+      <Block innerClassName="pt-32 pb-6">
         <div className="text-6xl pb-5 pt-8 subpixel-antialiased font-serif ">
           {product.nameZh && locale === 'zh' ? product.nameZh : product.name}
         </div>
