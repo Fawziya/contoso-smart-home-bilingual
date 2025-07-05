@@ -49,7 +49,7 @@ export default function CountdownBanner({ productSlug }: CountdownBannerProps) {
   }
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 animate-gradient-x bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 text-white">
+    <div className="fixed top-16 left-0 right-0 z-40 animate-gradient-x bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 text-white">
       <div className="container mx-auto px-2 sm:px-4 py-2 sm:py-3">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
           {/* Left side - Flash sale text and promotion */}
