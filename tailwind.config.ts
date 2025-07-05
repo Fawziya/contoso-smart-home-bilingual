@@ -9,6 +9,10 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        'inter': ['Inter', 'sans-serif'],
+        'chinese': ['"Noto Sans SC"', 'Inter', 'sans-serif'],
+      },
       colors: {
         primary: {
           light: '#FAFAFA', // 有质感的白色-浅

@@ -17,5 +17,10 @@
     "outOfStock": "缺货",
     "discount": "优惠11%",
     "loading": "正在加载..."
+  },
+  "countdown": {
+    "flashSale": "限时抢购",
+    "promotion": "50%优惠促销活动倒计时:",
+    "timeLeft": "剩余时间"
   }
 }

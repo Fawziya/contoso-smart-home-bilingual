@@ -12,12 +12,25 @@ export default function Home({
   params,
   searchParams,
 }: {
-  params?: { lang: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+  params?: Promise<{ lang: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { t, locale } = useTranslation();
   const [isClient, setIsClient] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [resolvedParams, setResolvedParams] = useState<{ lang: string } | null>(null);
+  const [resolvedSearchParams, setResolvedSearchParams] = useState<{ [key: string]: string | string[] | undefined }>({});
+  
+  // 解析Promise类型的params和searchParams
+  useEffect(() => {
+    Promise.all([
+      params || Promise.resolve(null),
+      searchParams
+    ]).then(([p, sp]) => {
+      setResolvedParams(p);
+      setResolvedSearchParams(sp);
+    });
+  }, [params, searchParams]);
   
   useEffect(() => {
     setIsClient(true);
@@ -75,7 +88,7 @@ export default function Home({
 
   return (
     <>
-      <Header params={{slug: ''}} searchParams={searchParams} />
+      <Header params={{slug: ''}} searchParams={resolvedSearchParams} />
       <Block
         outerClassName="bg-primary border-b border-gray-100"
         innerClassName=""
@@ -234,7 +247,7 @@ export default function Home({
                           {locale === 'zh' ? "立即购买" : "Buy now"}
                         </a>
                         <a 
-                          href={`/${locale}/products/${product.slug}${searchParams?.type ? "?type=" + searchParams.type : ""}`}
+                          href={`/${locale}/products/${product.slug}${resolvedSearchParams?.type ? "?type=" + resolvedSearchParams.type : ""}`}
                           className="border border-secondary-dark text-secondary-dark px-3 py-2 rounded text-sm font-medium text-center flex-1 hover:bg-hover transition-colors"
                         >
                           {locale === 'zh' ? "了解更多" : "Learn more"}
