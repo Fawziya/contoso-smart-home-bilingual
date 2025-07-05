@@ -50,37 +50,37 @@ export default function CountdownBanner({ productSlug }: CountdownBannerProps) {
 
   return (
     <div className="fixed top-0 left-0 right-0 z-50 animate-gradient-x bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 text-white">
-      <div className="container mx-auto px-4 py-3">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="container mx-auto px-2 sm:px-4 py-2 sm:py-3">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
           {/* Left side - Flash sale text and promotion */}
-          <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">🔥</span>
-              <span className="text-lg font-bold animate-pulse">{t('countdown.flashSale')}</span>
+          <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 md:gap-4">
+            <div className="flex items-center gap-1 sm:gap-2">
+              <span className="text-lg sm:text-2xl">🔥</span>
+              <span className="text-sm sm:text-lg font-bold animate-pulse">{t('countdown.flashSale')}</span>
             </div>
-            <div className="bg-yellow-400 text-black px-2 py-1 rounded-lg text-sm font-bold animate-bounce">
+            <div className="bg-yellow-400 text-black px-2 py-1 rounded-lg text-xs sm:text-sm font-bold animate-bounce">
               50% OFF
             </div>
           </div>
 
           {/* Center - Promotion text */}
-          <div className="text-center">
-            <div className="text-sm md:text-base font-medium">
+          <div className="text-center order-last sm:order-none">
+            <div className="text-xs sm:text-sm md:text-base font-medium">
               {t('countdown.promotion')}
             </div>
           </div>
 
           {/* Right side - Timer and close button */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto justify-between sm:justify-end">
             <div className="flex flex-col items-center">
               <div className="text-xs text-yellow-100">{t('countdown.timeLeft')}</div>
-              <div className="text-xl md:text-2xl font-mono font-bold bg-black bg-opacity-20 px-3 py-1 rounded">
+              <div className="text-lg sm:text-xl md:text-2xl font-mono font-bold bg-black bg-opacity-20 px-2 sm:px-3 py-1 rounded">
                 {formatTime(timeLeft)}
               </div>
             </div>
             <button
               onClick={() => setIsVisible(false)}
-              className="text-white hover:text-yellow-200 text-xl font-bold p-1"
+              className="text-white hover:text-yellow-200 text-lg sm:text-xl font-bold p-1 flex-shrink-0"
               aria-label="Close banner"
             >
               ×
