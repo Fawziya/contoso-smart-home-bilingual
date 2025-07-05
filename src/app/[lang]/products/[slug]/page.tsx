@@ -17,13 +17,26 @@ export default function ProductPage({
   params,
   searchParams,
 }: {
-  params: { lang: string; slug: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
+  params: Promise<{ lang: string; slug: string }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { setLocale, locale } = useTranslation();
   const [product, setProduct] = useState<Product | null>(null);
   const [manual, setManual] = useState<string>('');
   const [isClient, setIsClient] = useState(false);
+  const [resolvedParams, setResolvedParams] = useState<{ lang: string; slug: string } | null>(null);
+  const [resolvedSearchParams, setResolvedSearchParams] = useState<{ [key: string]: string | string[] | undefined } | null>(null);
+  
+  // 解析Promise类型的params和searchParams
+  useEffect(() => {
+    Promise.all([
+      params,
+      searchParams || Promise.resolve({})
+    ]).then(([p, sp]) => {
+      setResolvedParams(p);
+      setResolvedSearchParams(sp);
+    });
+  }, [params, searchParams]);
   
   // 获取根据当前语言的章节定义
   const getSectionsByLocale = (currentLocale: string) => {
@@ -66,17 +79,17 @@ export default function ProductPage({
   
   // 当组件加载时，更新语言上下文
   useEffect(() => {
-    if (params.lang && supportedLocales.includes(params.lang) && isClient) {
+    if (resolvedParams?.lang && supportedLocales.includes(resolvedParams.lang) && isClient) {
       if (typeof window !== 'undefined') {
-        localStorage.setItem('language', params.lang);
+        localStorage.setItem('language', resolvedParams.lang);
       }
-      setLocale(params.lang);
+      setLocale(resolvedParams.lang);
     }
-  }, [params.lang, setLocale, isClient]);
+  }, [resolvedParams?.lang, setLocale, isClient]);
   
   // 获取产品数据
   useEffect(() => {
-    if (!isClient) return;
+    if (!isClient || !resolvedParams) return;
     
     async function fetchData() {
       try {
@@ -88,7 +101,7 @@ export default function ProductPage({
         }
         
         const products = await response.json();
-        const foundProduct = products.find((p: Product) => p.slug === params.slug);
+        const foundProduct = products.find((p: Product) => p.slug === resolvedParams?.slug);
         
         if (foundProduct) {
           setProduct(foundProduct);
@@ -108,7 +121,7 @@ export default function ProductPage({
                 return `product_info_${match[1]}.md`;
               }
               // 如果没有匹配到数字格式，则使用产品slug生成文件名
-              return `${params.slug}.md`;
+              return `${resolvedParams?.slug}.md`;
             };
             
             const manualFilename = getManualFilename();
@@ -145,7 +158,7 @@ export default function ProductPage({
             setManual('# Product Information\n\nUnable to load product information.');
           }
         } else {
-          console.error(`Product with slug ${params.slug} not found`);
+          console.error(`Product with slug ${resolvedParams?.slug} not found`);
         }
       } catch (error) {
         console.error("Error fetching product data:", error);
@@ -153,7 +166,7 @@ export default function ProductPage({
     }
     
     fetchData();
-  }, [params.slug, locale, isClient]);
+  }, [resolvedParams?.slug, locale, isClient, resolvedParams]);
   
   // 解析Markdown章节
   const getSection = (idx: number) => {
@@ -232,10 +245,10 @@ export default function ProductPage({
   const extraclasses = "[&_li]:ml-8 [&_ol]:list-decimal [&_ul]:list-disc [&_h2]:text-2xl [&_h2]:font-extrabold [&_h2]:pt-3 [&_h2]:pb-3 [&_h3]:text-xl [&_h3]:font-bold [&_h3]:pt-3 [&_h3]:pb-3 [&_h4]:text-lg [&_h4]:font-semibold [&_h4]:pt-3 [&_h4]:pb-3 [&_ol]:list-decimal [&_ol]:list-outside [&_ul]:list-outside";
   
   // 在服务器端渲染时显示简单的加载状态，防止水合错误
-  if (!isClient) {
+  if (!isClient || !resolvedParams) {
     return (
       <>
-        <Header params={{slug: params.slug}} searchParams={searchParams} />
+        <Header params={{slug: ''}} searchParams={resolvedSearchParams || {}} />
         <div className="flex justify-center items-center min-h-screen">
           <div className="text-center">Loading...</div>
         </div>
@@ -247,7 +260,7 @@ export default function ProductPage({
   if (!product) {
     return (
       <>
-        <Header params={{slug: params.slug}} searchParams={searchParams} />
+        <Header params={{slug: resolvedParams?.slug || ''}} searchParams={resolvedSearchParams || {}} />
         <Block innerClassName="pt-6 pb-6">
           <div className="text-center py-8">
             {locale === 'zh' ? '正在加载...' : 'Loading...'}
@@ -260,7 +273,7 @@ export default function ProductPage({
   // 渲染产品页面
   return (
     <>
-      <Header params={{slug: params.slug}} searchParams={searchParams} />
+      <Header params={{slug: resolvedParams.slug}} searchParams={resolvedSearchParams || {}} />
       <Block innerClassName="pt-6 pb-6">
         <div className="text-6xl pb-5 pt-8 subpixel-antialiased font-serif ">
           {product.nameZh && locale === 'zh' ? product.nameZh : product.name}

@@ -87,10 +87,11 @@ export default async function Page({
   params,
   searchParams,
 }: {
-  params: { slug: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
+  params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const product = await getData(params.slug);
+  const resolvedParams = await params;
+  const product = await getData(resolvedParams.slug);
   const manual = await getManual(product.manual);
   const mitems = manual.split("\n");
 
@@ -143,7 +144,7 @@ export default async function Page({
     "[&_ol]:list-decimal [&_ol]:list-outside [&_ul]:list-outside";
   return (
     <>
-      <Header params={params} searchParams={searchParams} />
+      <Header params={{slug: resolvedParams.slug}} searchParams={searchParams ? await searchParams : {}} />
       <Block innerClassName="pt-6 pb-6">
         <div className="text-6xl pb-5 pt-8 subpixel-antialiased font-serif ">
           {product.name}

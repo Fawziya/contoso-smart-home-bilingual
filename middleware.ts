@@ -1,8 +1,8 @@
 import createMiddleware from 'next-intl/middleware';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
  
 // 处理默认路径重定向到英文版本
-function redirectToDefaultLocale(request) {
+function redirectToDefaultLocale(request: NextRequest) {
   const url = request.nextUrl.clone();
   if (url.pathname === '/') {
     url.pathname = '/en';
@@ -21,7 +21,7 @@ const intlMiddleware = createMiddleware({
 });
 
 // 组合中间件
-export default function middleware(request) {
+export default function middleware(request: NextRequest) {
   const redirectResponse = redirectToDefaultLocale(request);
   if (redirectResponse) return redirectResponse;
   return intlMiddleware(request);
