@@ -4,6 +4,7 @@ import Chat from "@/components/chat";
 import Block from "@/components/block";
 import Header from "@/components/header";
 import { LanguageProvider } from "@/lib/language-context";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Contoso Smart Home",
@@ -38,7 +39,9 @@ export default function RootLayout({
                 </p>
               </footer>
             </main>
-            <Chat />
+            <Suspense fallback={<div>Loading chat...</div>}>
+              <Chat />
+            </Suspense>
           </div>
         </LanguageProvider>
       </body>

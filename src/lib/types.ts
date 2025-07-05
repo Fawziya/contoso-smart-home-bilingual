@@ -52,3 +52,20 @@ export interface GroundedMessage {
   message: string;
   citations: Citation[];
 };
+
+// TTS Audio interfaces
+export interface TTSRequest {
+  text: string;
+  language: 'en' | 'zh';
+  voiceId?: string;
+  stability?: number;
+  similarityBoost?: number;
+  style?: number;
+}
+
+export interface TTSResponse {
+  audioUrl: string;
+  error?: string;
+}
+
+export type AudioState = 'idle' | 'loading' | 'playing' | 'paused' | 'error';

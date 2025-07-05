@@ -10,6 +10,7 @@ import { marked } from "marked";
 import Header from "@/components/header";
 import CountdownBanner from "@/components/countdown-banner";
 import { getImageWithTimestamp } from "@/lib/imageUtils";
+import TTSAudio from "@/components/tts-audio";
 
 // 支持的语言列表
 const supportedLocales = ['en', 'zh'];
@@ -287,6 +288,16 @@ export default function ProductPage({
                   first-letter:text-8xl first-letter:font-bold first-letter:text-slate-900
                   first-letter:mr-3 first-letter:float-left"
         >
+          {/* Add TTS Audio component for Meowtica Smart Hub (Product ID: 1) */}
+          {product.id === 1 && (
+            <div className="mb-4 clear-both">
+              <TTSAudio 
+                text={product.descriptionZh && locale === 'zh' ? product.descriptionZh : product.description}
+                productId={product.id}
+                className="mb-3"
+              />
+            </div>
+          )}
           {product.descriptionZh && locale === 'zh' ? product.descriptionZh : product.description}
         </div>
       </Block>
