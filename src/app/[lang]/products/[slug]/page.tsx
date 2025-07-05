@@ -292,8 +292,7 @@ export default function ProductPage({
           {product.id === 1 && (
             <div className="mb-4 clear-both">
               <TTSAudio 
-                text={product.descriptionZh && locale === 'zh' ? product.descriptionZh : product.description}
-                productId={product.id}
+                productSlug={product.slug}
                 className="mb-3"
               />
             </div>

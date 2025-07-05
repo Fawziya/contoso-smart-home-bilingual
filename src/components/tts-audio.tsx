@@ -7,27 +7,23 @@ import {
   ArrowPathIcon,
   SpeakerWaveIcon
 } from '@heroicons/react/24/outline';
-import { TTSRequest, TTSResponse, AudioState } from '@/lib/types';
+import { AudioState } from '@/lib/types';
 import { useTranslation } from '@/lib/language-context';
 
 interface TTSAudioProps {
-  text: string;
-  productId?: number;
+  productSlug: string;
   className?: string;
 }
 
-// Cache for audio URLs to avoid repeated API calls
-const audioCache = new Map<string, string>();
-
-export default function TTSAudio({ text, productId, className = '' }: TTSAudioProps) {
+export default function TTSAudio({ productSlug, className = '' }: TTSAudioProps) {
   const { locale } = useTranslation();
   const [audioState, setAudioState] = useState<AudioState>('idle');
   const [errorMessage, setErrorMessage] = useState<string>('');
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const currentAudioUrl = useRef<string>('');
 
-  // Generate cache key
-  const getCacheKey = (text: string, language: string) => `${language}-${text}`;
+  // Get audio file path based on product slug and language
+  const getAudioPath = (productSlug: string, language: string) => 
+    `/audio/${productSlug}-${language}.mp3`;
 
   // Clean up audio resources
   const cleanupAudio = () => {
@@ -36,55 +32,44 @@ export default function TTSAudio({ text, productId, className = '' }: TTSAudioPr
       audioRef.current.src = '';
       audioRef.current = null;
     }
-    if (currentAudioUrl.current) {
-      URL.revokeObjectURL(currentAudioUrl.current);
-      currentAudioUrl.current = '';
-    }
   };
 
-  // Generate TTS audio using ElevenLabs MCP server
-  const generateTTS = async (text: string, language: 'en' | 'zh'): Promise<string> => {
-    const cacheKey = getCacheKey(text, language);
-    
-    // Check cache first
-    if (audioCache.has(cacheKey)) {
-      return audioCache.get(cacheKey)!;
-    }
+  // Load audio from audio directory
+  const loadAudio = (productSlug: string, language: 'en' | 'zh'): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      try {
+        const audioPath = getAudioPath(productSlug, language);
+        
+        // Create new audio element
+        cleanupAudio();
+        audioRef.current = new Audio(audioPath);
 
-    try {
-      const ttsRequest: TTSRequest = {
-        text,
-        language,
-        // Configure voice settings for optimal quality
-        stability: 0.5,
-        similarityBoost: 0.8,
-        style: 0.3
-      };
+        // Set up audio event listeners
+        audioRef.current.addEventListener('ended', () => {
+          setAudioState('idle');
+        });
 
-      // Call ElevenLabs MCP server API
-      const response = await fetch('/api/tts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(ttsRequest),
-      });
+        audioRef.current.addEventListener('error', () => {
+          setAudioState('error');
+          setErrorMessage('Audio file not found or failed to load');
+          reject(new Error('Audio failed to load'));
+        });
 
-      if (!response.ok) {
-        throw new Error(`TTS API error: ${response.status} ${response.statusText}`);
+        audioRef.current.addEventListener('loadstart', () => {
+          setAudioState('loading');
+        });
+
+        audioRef.current.addEventListener('canplay', () => {
+          setAudioState('playing');
+          resolve();
+        });
+
+        // Start loading
+        audioRef.current.load();
+      } catch (error) {
+        reject(error);
       }
-
-      const audioBlob = await response.blob();
-      const audioUrl = URL.createObjectURL(audioBlob);
-      
-      // Cache the audio URL
-      audioCache.set(cacheKey, audioUrl);
-      
-      return audioUrl;
-    } catch (error) {
-      console.error('TTS generation failed:', error);
-      throw new Error('Failed to generate audio. Please try again.');
-    }
+    });
   };
 
   // Handle play/pause toggle
@@ -107,39 +92,18 @@ export default function TTSAudio({ text, productId, className = '' }: TTSAudioPr
       return;
     }
 
-    // Generate and play new audio
+    // Load and play audio from audio directory
     setAudioState('loading');
     setErrorMessage('');
 
     try {
-      const audioUrl = await generateTTS(text, locale as 'en' | 'zh');
+      await loadAudio(productSlug, locale as 'en' | 'zh');
       
-      // Create new audio element
-      cleanupAudio();
-      audioRef.current = new Audio(audioUrl);
-      currentAudioUrl.current = audioUrl;
-
-      // Set up audio event listeners
-      audioRef.current.addEventListener('ended', () => {
-        setAudioState('idle');
-      });
-
-      audioRef.current.addEventListener('error', () => {
-        setAudioState('error');
-        setErrorMessage('Audio playback failed');
-      });
-
-      audioRef.current.addEventListener('loadstart', () => {
-        setAudioState('loading');
-      });
-
-      audioRef.current.addEventListener('canplay', () => {
-        setAudioState('playing');
-      });
-
       // Start playback
-      await audioRef.current.play();
-      setAudioState('playing');
+      if (audioRef.current) {
+        await audioRef.current.play();
+        setAudioState('playing');
+      }
     } catch (error) {
       setAudioState('error');
       setErrorMessage(error instanceof Error ? error.message : 'An error occurred');
@@ -159,13 +123,13 @@ export default function TTSAudio({ text, productId, className = '' }: TTSAudioPr
       case 'idle':
         return locale === 'zh' ? '点击播放音频' : 'Click to play audio';
       case 'loading':
-        return locale === 'zh' ? '正在生成音频...' : 'Generating audio...';
+        return locale === 'zh' ? '正在加载音频...' : 'Loading audio...';
       case 'playing':
         return locale === 'zh' ? '正在播放...' : 'Playing...';
       case 'paused':
         return locale === 'zh' ? '已暂停' : 'Paused';
       case 'error':
-        return locale === 'zh' ? '播放出错' : 'Playback error';
+        return locale === 'zh' ? '播放出错' : 'Audio error';
       default:
         return '';
     }
